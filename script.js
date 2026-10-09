@@ -1,43 +1,50 @@
 document.addEventListener("DOMContentLoaded", () => {
-    gsap.registerPlugin(ScrollTrigger);
-
     const canvas = document.getElementById("hero-canvas");
     const context = canvas.getContext("2d");
 
-    const frameCount = 120; 
-    const currentFrame = index => `./frames/frame_${String(index + 1).padStart(4, '0')}.webp`;
+    const frameCount = 8; // Ajuste para o número total de frames da sua pasta
+
+    const currentFrame = (index) => {
+        const frameNumber = String(index + 1).padStart(4, '0');
+        return `./frames/frame-${frameNumber}.webp`;
+    };
 
     const images = [];
-    const frameSequence = { frame: 0 };
+    const frameState = { frame: 0 };
+    let imagesLoaded = 0;
 
-    function preloadImages() {
-        for (let i = 0; i < frameCount; i++) {
-            const img = new Image();
-            img.src = currentFrame(i);
-            images.push(img);
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        if (images[frameState.frame] && images[frameState.frame].complete) {
+            render();
         }
     }
 
-    preloadImages();
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
 
-    function updateCanvasSize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        render();
+    for (let i = 0; i < frameCount; i++) {
+        const img = new Image();
+        img.src = currentFrame(i);
+        img.onload = () => {
+            imagesLoaded++;
+            if (imagesLoaded === 1) {
+                render();
+            }
+        };
+        images.push(img);
     }
-
-    window.addEventListener("resize", updateCanvasSize);
-    updateCanvasSize();
-
-    images[0].onload = render;
 
     function render() {
         context.clearRect(0, 0, canvas.width, canvas.height);
-        let img = images[frameSequence.frame];
-        if (img) {
+        const img = images[Math.round(frameState.frame)];
+        
+        if (img && img.complete) {
             const hRatio = canvas.width / img.width;
             const vRatio = canvas.height / img.height;
             const ratio = Math.max(hRatio, vRatio);
+            
             const centerShiftX = (canvas.width - img.width * ratio) / 2;
             const centerShiftY = (canvas.height - img.height * ratio) / 2;
             
@@ -45,12 +52,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    gsap.to(frameSequence, {
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.to(frameState, {
         frame: frameCount - 1,
         snap: "frame",
         ease: "none",
         scrollTrigger: {
-            trigger: "#hero-scroller",
+            trigger: "#hero-trigger",
             start: "top top",
             end: "bottom bottom",
             scrub: 0.5,
