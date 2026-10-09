@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.getElementById("hero-canvas");
     const context = canvas.getContext("2d");
 
-    const frameCount = 8; // Ajuste para o número total de frames da sua pasta
+    const frameCount = 240; // Ajuste para o número total de frames da sua pasta
 
     const currentFrame = (index) => {
         const frameNumber = String(index + 1).padStart(4, '0');
