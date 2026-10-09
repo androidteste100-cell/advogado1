@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const currentFrame = (index) => {
         const frameNumber = String(index + 1).padStart(4, '0');
-        return `./frames/frame-${frameNumber}.webp`;
+        return `./frames/frame_${frameNumber}.webp`;
     };
 
     const images = [];
